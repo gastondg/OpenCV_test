@@ -1,55 +1,47 @@
 import cv2
 import numpy as np
-import sys
-import tkinter as tk
-from tkinter import filedialog
 
-image_hsv = None
-pixel = (0, 0, 0)  # RANDOM DEFAULT VALUE
+def nothing(x):
+    pass
 
-ftypes = [
-    ('JPG', '*.jpg;*.JPG;*.JPEG'),
-    ('PNG', '*.png;*.PNG'),
-    ('GIF', '*.gif;*.GIF'),
-]
+cam = cv2.VideoCapture(0)
 
-
-def pick_color(event, x, y, flags, param):
-    if event == cv2.EVENT_LBUTTONDOWN:
-        pixel = image_hsv[y, x]
-
-        #HUE, SATURATION, AND VALUE (BRIGHTNESS) RANGES. TOLERANCE COULD BE ADJUSTED.
-        upper = np.array([pixel[0] + 10, pixel[1] + 10, pixel[2] + 40])
-        lower = np.array([pixel[0] - 10, pixel[1] - 10, pixel[2] - 40])
-        print(lower, upper)
-
-        #A MONOCHROME MASK FOR GETTING A BETTER VISION OVER THE COLORS
-        image_mask = cv2.inRange(image_hsv, lower, upper)
-        cv2.imshow("Mask", image_mask)
+cv2.namedWindow("hsv_picker")
+# defino lower
+cv2.createTrackbar("Low H", "hsv_picker", 0, 255, nothing)
+cv2.createTrackbar("Low S", "hsv_picker", 0, 255, nothing)
+cv2.createTrackbar("Low V", "hsv_picker", 0, 255, nothing)
+# defino upper
+cv2.createTrackbar("Up H", "hsv_picker", 255, 255, nothing)
+cv2.createTrackbar("Up S", "hsv_picker", 255, 255, nothing)
+cv2.createTrackbar("Up V", "hsv_picker", 255, 255, nothing)
 
 
-def main():
 
-    global image_hsv, pixel
+while cam.isOpened():
+    ret, img = cam.read()
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-    #OPEN DIALOG FOR READING THE IMAGE FILE
-    root = tk.Tk()
-    root.withdraw()  # HIDE THE TKINTER GUI
-    #file_path = filedialog.askopenfilename(filetypes=ftypes)
-    image_src = cv2.imread(
-        '/home/gdigiuseppe/Documentos/OpenCV/Pruebas/imagenes/botella.jpg')
-    cv2.imshow("BGR", image_src)
+    low_h = cv2.getTrackbarPos("Low H", "hsv_picker")
+    low_s = cv2.getTrackbarPos("Low S", "hsv_picker")
+    low_v = cv2.getTrackbarPos("Low V", "hsv_picker")
 
-    #CREATE THE HSV FROM THE BGR IMAGE
-    image_hsv = cv2.cvtColor(image_src, cv2.COLOR_BGR2HSV)
-    cv2.imshow("HSV", image_hsv)
+    up_h = cv2.getTrackbarPos("Up H", "hsv_picker")
+    up_s = cv2.getTrackbarPos("Up S", "hsv_picker")
+    up_v = cv2.getTrackbarPos("Up V", "hsv_picker")
 
-    #CALLBACK FUNCTION
-    cv2.setMouseCallback("HSV", pick_color)
+    lower_color = np.array([low_h, low_s, low_v])
+    upper_color = np.array([up_h, up_s, up_v])
 
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    mask = cv2.inRange(hsv, lower_color, upper_color)
+    res = cv2.bitwise_and(img, img, mask=mask)
 
+    cv2.imshow("Cam", img)
+    cv2.imshow("Mask", mask)
+    cv2.imshow("Result", res)
 
-if __name__ == '__main__':
-    main()
+    if cv2.waitKey(10) & 0xFF == ord('q'):
+        break
+    
+cam.release()
+cv2.destroyAllWindows()
