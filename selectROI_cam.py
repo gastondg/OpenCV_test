@@ -2,6 +2,22 @@ import cv2
 import numpy as np
 
 
+def get_porcentaje_color(mask):
+    # unos = color , ceros = ausencia de color
+    ceros = len(mask[mask == 0])
+    unos = len(mask[mask == 255])
+    total = ceros + unos
+    porcentaje_unos = unos / total * 100
+    porcentaje_ceros = ceros / total * 100
+
+    """ print("Cantidad de ceros: " + str(ceros))
+    print("Cantidad de unos: " + str(unos))
+    print("Porcentaje de unos: " + str(porcentaje_unos))
+    print("Porcentaje de ceros: " + str(porcentaje_ceros)) """
+
+    return porcentaje_unos, porcentaje_ceros
+
+
 def get_hsv_mask(img):
     # por ahora no le paso el color, pero debería
     imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -42,9 +58,17 @@ while cam.isOpened():
         if i == 1:
             print(mask_rgb)
             i = 2
-        rect = cv2.rectangle(img, (x,y), (x+w,y+h), (100, 50, 200), 5)
+        rect = cv2.rectangle(img, (x,y), (x+w,y+h), (100, 0, 0), 5)
         img[y:y+h, x:x+w] = mask_rgb
+        porcentaje_unos, porcentaje_ceros = get_porcentaje_color(mask)
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        ceros = "Porcentaje de unos: " + str(porcentaje_unos)
+        unos = "Porcentaje de ceros: " + str(porcentaje_ceros)
+        img = cv2.putText(img, ceros, (5,20), font, 0.5, (0,255,255), 2)
+        img = cv2.putText(img, unos, (5, 40), font, 0.5, (0, 255, 255), 2)
+
         cv2.imshow("Cam", img)
+        
         #cv2.imshow("Filtro",res)
     else:
         cv2.imshow("Cam", img)

@@ -1,4 +1,6 @@
 env/
 .ipynb_checkpoints/
 .vscode/
-
+YOLOv3/coco.names
+YOLOv3/yolov3.cfg
+YOLOv3/yolov3.weights
