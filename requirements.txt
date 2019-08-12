@@ -42,6 +42,8 @@ pycodestyle==2.5.0
 Pygments==2.4.2
 pylint==2.3.1
 pyparsing==2.4.0
+PyQt5==5.13.0
+PyQt5-sip==4.19.18
 pyrsistent==0.15.3
 python-dateutil==2.8.0
 pyzmq==18.0.2
