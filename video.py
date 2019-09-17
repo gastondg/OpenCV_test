@@ -1,27 +1,34 @@
-
 import cv2
 import numpy as np
+from datetime import datetime
 
-def view_cam():
+from utils import CFEVideoConf
+
+cap = cv2.VideoCapture(0)
+
+save_path = 'prueba720p.mp4'
+frames_per_seconds = 24
+config = CFEVideoConf(cap, filepath=save_path, res='720p')
+out = cv2.VideoWriter(save_path, config.video_type,
+                      frames_per_seconds, config.dims)
+start_time = datetime.now()
+while True:
+
+    _, frame = cap.read()
     
-    cam = cv2.VideoCapture(0)
+    if frame is None:
+        continue
 
-    fontFace = cv2.FONT_HERSHEY_SIMPLEX
-    fontScale = 1
-    fontColor = (255, 255, 255)
+    # grabar 30 segundos y después cortar
+    out.write(frame)
+    b = datetime.now()
+    fin_time = b-start_time
+    if int(fin_time.seconds) == 10:
+        # finalizar el video
+        break
 
-    ret, im = cam.read()
-    locy = int(im.shape[0]/2) # the text location will be in the middle
-    locx = int(im.shape[1]/2) #           of the frame for this example
+out.release()
+cap.release()
 
-    while True:
-        ret, im = cam.read()
-        cv2.putText(im, "Success!", (locx, locy), fontFace, fontScale, fontColor) 
-        cv2.imshow('Front Cam', im)
-        if cv2.waitKey(10) & 0xFF==ord('q'):
-            break
 
-    cam.release()
-    cv2.destroyAllWindows()
 
-view_cam()
