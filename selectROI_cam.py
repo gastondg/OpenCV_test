@@ -2,18 +2,17 @@ import cv2
 import numpy as np
 
 
-def get_porcentaje_color(mask):
-    # unos = color , ceros = ausencia de color
-    ceros = len(mask[mask == 0])
-    unos = len(mask[mask == 255])
+def get_porcentaje_color(mask, frame_width, frame_height):
+    """  
+    unos = color , ceros = ausencia de color
+    """ 
+    unos = np.sum(mask == 255)
+    print("Numero de unos: " + str(unos))
+    ceros = np.sum(mask == 0)
+    print("Numero de ceros: " + str(ceros))
     total = ceros + unos
-    porcentaje_unos = unos / total * 100
-    porcentaje_ceros = ceros / total * 100
-
-    """ print("Cantidad de ceros: " + str(ceros))
-    print("Cantidad de unos: " + str(unos))
-    print("Porcentaje de unos: " + str(porcentaje_unos))
-    print("Porcentaje de ceros: " + str(porcentaje_ceros)) """
+    porcentaje_unos = (unos / total) * 100
+    porcentaje_ceros = (ceros / total) * 100
 
     return porcentaje_unos, porcentaje_ceros
 
@@ -34,6 +33,9 @@ def select_roi(img):
 cam = cv2.VideoCapture(0)
 i=1
 band = False
+font = cv2.FONT_HERSHEY_SIMPLEX
+frame_width = int(cam.get(3))
+frame_height = int(cam.get(4))
 while cam.isOpened():
     ret, img = cam.read() #img es el frame de ese momento
     
@@ -60,8 +62,9 @@ while cam.isOpened():
             i = 2
         rect = cv2.rectangle(img, (x,y), (x+w,y+h), (100, 0, 0), 5)
         img[y:y+h, x:x+w] = mask_rgb
-        porcentaje_unos, porcentaje_ceros = get_porcentaje_color(mask)
-        font = cv2.FONT_HERSHEY_SIMPLEX
+        porcentaje_unos, porcentaje_ceros = get_porcentaje_color(
+            mask, frame_width, frame_height)
+        
         ceros = "Porcentaje de unos: " + str(porcentaje_unos)
         unos = "Porcentaje de ceros: " + str(porcentaje_ceros)
         img = cv2.putText(img, ceros, (5,20), font, 0.5, (0,255,255), 2)

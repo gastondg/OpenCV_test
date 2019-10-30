@@ -4,7 +4,8 @@ import os
 import glob
 import random
 
-face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
+face_cascade = cv2.CascadeClassifier(
+    "/home/gastondg/Documentos/OpenCV_test/instagram_filters/haarcascade_frontalface_default.xml")
 #eye_cascade = cv2.CascadeClassifier("haarcascade_eye.xml")
 
 path = '/home/gastondg/Documentos/OpenCV_test/instagram_filters/imagenes/'
